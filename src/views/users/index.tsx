@@ -116,15 +116,31 @@ const Users: FC = () => {
         enableSorting: true,
         enableHiding: true,
       },
+      // {
+      //   id: "actions",
+      //   cell: ({ row }) => (
+      //     <DataTableRowActions
+      //       deleteAction={handleDelete}
+      //       editAction={handleEdit}
+      //       row={row}
+      //     />
+      //   ),
+      // },
       {
-        id: "actions",
+        id: "edit",
+        header: "Edit",
         cell: ({ row }) => (
-          <DataTableRowActions
-            deleteAction={handleDelete}
-            editAction={handleEdit}
-            row={row}
-          />
+          <div>
+            <Button
+              onClick={() => handleEdit(row.original)}
+              size="sm"
+            >
+              Edit
+            </Button>
+          </div>
         ),
+        enableSorting: false,
+        enableHiding: false,
       },
     ],
     []
