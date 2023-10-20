@@ -10,7 +10,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { useGetBuisnessesQuery } from "@/store/services/buisnessService";
-import DeleteModal from "@/components/modal/delete-modal";
 import Link from "next/link";
 // import CreateBusiness from "./CreateBusiness";
 import { useSession } from "next-auth/react";
@@ -141,50 +140,13 @@ const Buisnesses: FC = () => {
         enableSorting: true,
         enableHiding: true,
       },
-      {
-        id: "actions",
-        cell: ({ row }) => (
-          <DataTableRowActions
-            deleteAction={handleDelete}
-            editAction={handleEdit}
-            row={row}
-          />
-        ),
-      },
     ],
     []
   );
 
   const loadingData = Array.from({ length: 10 }, () => null);
 
-  const toggleModal = useCallback(() => {
-    setOpen((open) => !open);
-  }, [open]);
-
-  const toggleDeleteModal = useCallback(() => {
-    setOpenDelete((open) => !open);
-  }, [open]);
-
-  const handleEdit = (data: Buisness | null) => {
-    setSelectedBuisness(data);
-    toggleModal();
-  };
-
-  const handleDelete = (data: Buisness | null) => {
-    setSelectedBuisness(data);
-    toggleDeleteModal();
-  };
-
-  const confirmDelete = () => {
-    toast.error("Delete API is not implemented yet.");
-    toggleDeleteModal();
-  };
-
-  useEffect(() => {
-    if (!open && !openDelete) {
-      setSelectedBuisness(null);
-    }
-  }, [open, openDelete]);
+ 
 
   return (
     <>
@@ -213,12 +175,7 @@ const Buisnesses: FC = () => {
           filterKey="name"
         />
       </div>
-      <DeleteModal
-        open={openDelete}
-        setOpen={toggleDeleteModal}
-        loading={false}
-        confirmDelete={confirmDelete}
-      />
+     
     </>
   );
 };

@@ -9,9 +9,7 @@ import { DataTableRowActions } from "@/components/table/data-table-row-actions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import Modal from "@/components/modal";
 import LocationForm from "./LocationForm";
-import DeleteModal from "@/components/modal/delete-modal";
 import { useSession } from "next-auth/react";
 import { useGetLocationsQuery } from "@/store/services/locationService";
 
@@ -133,16 +131,6 @@ const Locations: FC = () => {
         enableSorting: true,
         enableHiding: true,
       },
-      {
-        id: "actions",
-        cell: ({ row }) => (
-          <DataTableRowActions
-            deleteAction={handleDelete}
-            editAction={handleEdit}
-            row={row}
-          />
-        ),
-      },
     ],
     []
   );
@@ -153,30 +141,7 @@ const Locations: FC = () => {
     setOpen((open) => !open);
   }, [open]);
 
-  const toggleDeleteModal = useCallback(() => {
-    setOpenDelete((open) => !open);
-  }, [open]);
 
-  const handleEdit = (data: Location | null) => {
-    setSelectedLocation(data);
-    toggleModal();
-  };
-
-  const handleDelete = (data: Location | null) => {
-    setSelectedLocation(data);
-    toggleDeleteModal();
-  };
-
-  const confirmDelete = () => {
-    toast.error("Delete API is not implemented yet.");
-    toggleDeleteModal();
-  };
-
-  useEffect(() => {
-    if (!open && !openDelete) {
-      setSelectedLocation(null);
-    }
-  }, [open, openDelete]);
 
   return (
     <>
@@ -203,18 +168,6 @@ const Locations: FC = () => {
           filterKey="name"
         />
       </div>
-      <Modal
-        title={selectedLocation ? "Update Location" : "Add New Location"}
-        open={open}
-        setOpen={toggleModal}
-        body={<LocationForm setOpen={toggleModal} data={selectedLocation} />}
-      />
-      <DeleteModal
-        open={openDelete}
-        setOpen={toggleDeleteModal}
-        loading={false}
-        confirmDelete={confirmDelete}
-      />
     </>
   );
 };
