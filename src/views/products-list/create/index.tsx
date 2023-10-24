@@ -23,6 +23,8 @@ import {
   SelectTrigger,
   SelectItem,
   SelectValue,
+  SelectLabel,
+  SelectGroup,
 } from "@/components/ui/select";
 import { useRouter } from "next/navigation";
 import { Unit } from "@/views/units";
@@ -54,7 +56,9 @@ const formSchema = z.object({
   type: z.string().min(1, { message: "Type is required." }),
   unit_id: z.string().min(1, { message: "Unit is required." }),
   product_images:
-    typeof window === "undefined" ? z.any() : z.array(z.instanceof(File)),
+    typeof window === "undefined"
+      ? z.any()
+      : z.array(z.instanceof(File)) || z.array(z.string()),
   tax_type: z.string().min(1, { message: "Tax Type is required." }),
   location_id: z.string().min(1, { message: "Location is required." }),
   manage_stock_status: z.boolean(),
@@ -65,7 +69,7 @@ const formSchema = z.object({
   brand_id: z.string().min(1, { message: "Brand is required." }),
   barcode_id: z.string().min(1, { message: "Barcode is required." }),
   tax_id: z.string().min(1, { message: "Tax is required." }),
-  weight: z.string().min(1, { message: "Wright is required." }),
+  weight: z.string().min(1, { message: "Weight is required." }),
   price_exclusive_tax: z.string().optional(),
   price_inclusive_tax: z.string().optional(),
   profit_margin: z.string().optional(),
@@ -111,18 +115,31 @@ const CreateProduct = () => {
       location_id: "",
       unit_id: String(product?.unit_id) || "",
       manage_stock_status: !!product?.manage_stock_status || false,
-      selling_price: "",
-      selling_price_inc_tax: "",
-      quantity: "",
-      product_images: [],
+      selling_price:
+        String(product?.product_variations[0]?.product_price?.selling_price) ||
+        "",
+      selling_price_inc_tax:
+        String(product?.product_variations[0]?.product_price?.selling_price) ||
+        "",
+      quantity: String(product?.alerty_quantity) || "",
+      product_images:
+        product?.product_images?.map((image) => image.image_url) || [],
       category_id: "",
-      price_exclusive_tax: "",
-      price_inclusive_tax: "",
-      profit_margin: "",
+      price_exclusive_tax:
+        String(
+          product?.product_variations[0]?.product_price?.price_exclusive_tax
+        ) || "",
+      price_inclusive_tax:
+        String(
+          product?.product_variations[0]?.product_price?.price_inclusive_tax
+        ) || "",
+      profit_margin:
+        String(product?.product_variations[0]?.product_price?.profit_margin) ||
+        "",
       brand_id: "",
       barcode_id: "",
       tax_id: "",
-      weight: "",
+      weight: product?.weight || "",
       variation_list: [],
       business_id: Number(session?.user?.business_id),
     },
@@ -303,7 +320,7 @@ const CreateProduct = () => {
     }
   }
 
-  const handleFileSelect = (files: File[]) => {
+  const handleFileSelect = (files: File[] | string[]) => {
     form.setValue("product_images", files);
   };
   const loadingData = Array.from({ length: 10 }, (_, index) => index + 1);
@@ -356,7 +373,7 @@ const CreateProduct = () => {
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue defaultValue={field.value} />
+                        <SelectValue />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent className="max-h-60">
@@ -617,7 +634,10 @@ const CreateProduct = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Tax Type</FormLabel>
-                  <Select onValueChange={field.onChange}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue />
@@ -625,7 +645,7 @@ const CreateProduct = () => {
                     </FormControl>
                     <SelectContent className="max-h-60">
                       <SelectItem value={"inclusive"}>Inclusive</SelectItem>
-                      <SelectItem value={"Exclusive"}>Exclusive</SelectItem>
+                      <SelectItem value={"exclusive"}>Exclusive</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -746,7 +766,11 @@ const CreateProduct = () => {
               </>
             )}
 
-            <FileInput fileAllowed={1} onChange={handleFileSelect} />
+            <FileInput
+              images={form.watch("product_images")}
+              fileAllowed={1}
+              onChange={handleFileSelect}
+            />
             <FormField
               control={form.control}
               name="manage_stock_status"
