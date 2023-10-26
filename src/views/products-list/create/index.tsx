@@ -33,7 +33,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Location } from "@/views/locations";
 import FileInput from "@/components/ui/file-input";
 import { Button } from "@/components/ui/button";
-import { useCreateProductMutation } from "@/store/services/productService";
+import {
+  useCreateProductMutation,
+  useUpdateProductMutation,
+} from "@/store/services/productService";
 import { Checkbox } from "@/components/ui/checkbox";
 import toast from "react-hot-toast";
 import { useEffect, useMemo } from "react";
@@ -55,10 +58,6 @@ const formSchema = z.object({
   sku: z.string().optional(),
   type: z.string().min(1, { message: "Type is required." }),
   unit_id: z.string().min(1, { message: "Unit is required." }),
-  product_images:
-    typeof window === "undefined"
-      ? z.any()
-      : z.array(z.instanceof(File)) || z.array(z.string()),
   tax_type: z.string().min(1, { message: "Tax Type is required." }),
   location_id: z.string().min(1, { message: "Location is required." }),
   manage_stock_status: z.boolean(),
@@ -96,12 +95,16 @@ const formSchema = z.object({
     })
   ),
   business_id: z.coerce.number(),
+  product_images:
+    typeof window === "undefined"
+      ? z.any()
+      : z.union([z.array(z.instanceof(File)), z.array(z.string())]),
 });
 
 const CreateProduct = () => {
   const { data: session } = useSession();
 
-  const { product } = useProduct();
+  const { product, clearProduct } = useProduct();
   const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -124,7 +127,7 @@ const CreateProduct = () => {
       quantity: String(product?.alerty_quantity) || "",
       product_images:
         product?.product_images?.map((image) => image.image_url) || [],
-      category_id: "",
+      category_id: String(product?.category_id) || "",
       price_exclusive_tax:
         String(
           product?.product_variations[0]?.product_price?.price_exclusive_tax
@@ -136,15 +139,14 @@ const CreateProduct = () => {
       profit_margin:
         String(product?.product_variations[0]?.product_price?.profit_margin) ||
         "",
-      brand_id: "",
-      barcode_id: "",
-      tax_id: "",
-      weight: product?.weight || "",
+      brand_id: String(product?.brand_id) || "",
+      barcode_id: String(product?.barcode_id) || "",
+      tax_id: String(product?.tax_id) || "",
+      weight: String(product?.weight) || "",
       variation_list: [],
       business_id: Number(session?.user?.business_id),
     },
   });
-
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "variation_list",
@@ -215,7 +217,13 @@ const CreateProduct = () => {
   }, [variations]);
 
   const [create, createResponse] = useCreateProductMutation();
+  const [update, updateResponse] = useUpdateProductMutation();
 
+  const {
+    isLoading: updateLoading,
+    isError: updateError,
+    isSuccess: updateSuccess,
+  } = updateResponse;
   const {
     isLoading: createLoading,
     isError: createError,
@@ -231,6 +239,16 @@ const CreateProduct = () => {
       router.push("/products/products-list");
     }
   }, [createError, createSuccess]);
+  useEffect(() => {
+    if (updateError) {
+      toast.error("Something Wrong.");
+    }
+    if (updateSuccess) {
+      toast.success("Product Updated Successfully.");
+      clearProduct();
+      router.push("/products/products-list");
+    }
+  }, [updateError, updateSuccess]);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     if (product === null) {
@@ -316,7 +334,95 @@ const CreateProduct = () => {
       formdata.append("category_id", values.category_id);
       create({ data: formdata });
     } else {
-      toast.success("Update");
+      const formdata = new FormData();
+      formdata.append("name", values.name);
+      formdata.append("description", values.description);
+      if (values.sku) {
+        formdata.append("sku", values.sku);
+      }
+      formdata.append("type", values.type);
+      formdata.append("unit_id", values.unit_id);
+      formdata.append("business_id", values.business_id?.toString());
+      formdata.append(
+        "manage_stock_status",
+        values.manage_stock_status ? "1" : "0"
+      );
+      formdata.append(`product_price[tax_type]`, values.tax_type);
+      if (values.type === "single") {
+        formdata.append(
+          `product_price[0][selling_price]`,
+          String(values.selling_price)
+        );
+        formdata.append(
+          `product_price[0][price_exclusive_tax]`,
+          String(values.price_exclusive_tax)
+        );
+        formdata.append(
+          `product_price[0][price_inclusive_tax]`,
+          String(values.price_inclusive_tax)
+        );
+        formdata.append(
+          `product_price[0][profit_margin]`,
+          String(values.profit_margin)
+        );
+        formdata.append(
+          `product_price[0][selling_price_inc_tax]`,
+          String(values.selling_price_inc_tax)
+        );
+        formdata.append(
+          `product_price[0][selling_price_inc_tax]`,
+          String(values.selling_price_inc_tax)
+        );
+      }
+
+      if (values.type === "variable") {
+        values?.variation_list?.forEach((variation, index) => {
+          formdata.append(
+            `product_price[${index}][price_exclusive_tax]`,
+            variation.price_exclusive_tax
+          );
+          formdata.append(
+            `product_price[${index}][price_inclusive_tax]`,
+            variation.price_inclusive_tax
+          );
+          formdata.append(
+            `product_price[${index}][profit_margin]`,
+            variation.profit_margin
+          );
+          formdata.append(
+            `product_price[${index}][selling_price]`,
+            variation.selling_price
+          );
+          formdata.append(
+            `product_price[${index}][selling_price_inc_tax]`,
+            variation?.selling_price_inc_tax || ""
+          );
+        });
+      }
+      formdata.append(`product_price[business_id]`, String(values.business_id));
+      formdata.append(`product_locations[]`, values.location_id);
+      if (
+        !values.product_images?.every(
+          (image: string) => typeof image === "string"
+        )
+      ) {
+        formdata.append(`product_images[]`, values.product_images[0]);
+      }
+      formdata.append("brand_id", values.brand_id);
+      formdata.append("barcode_id", values.barcode_id);
+      formdata.append("tax_id", values.tax_id);
+      formdata.append("weight", values.weight);
+
+      if (values.quantity) {
+        formdata.append(
+          `opening_stock[${values.location_id}][quantity][0]`,
+          values.quantity
+        );
+      }
+      formdata.append("category_id", values.category_id);
+
+      update({ data: formdata, id: product.id });
+      // toast.success("Update");
     }
   }
 
@@ -405,7 +511,10 @@ const CreateProduct = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Location</FormLabel>
-                  <Select onValueChange={field.onChange}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue />
@@ -442,7 +551,10 @@ const CreateProduct = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Category</FormLabel>
-                  <Select onValueChange={field.onChange}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue />
@@ -479,7 +591,10 @@ const CreateProduct = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Brand</FormLabel>
-                  <Select onValueChange={field.onChange}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue />
@@ -513,7 +628,10 @@ const CreateProduct = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Barcode</FormLabel>
-                  <Select onValueChange={field.onChange}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue />
@@ -551,7 +669,10 @@ const CreateProduct = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Tax</FormLabel>
-                  <Select onValueChange={field.onChange}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue />
@@ -586,7 +707,10 @@ const CreateProduct = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Unit</FormLabel>
-                  <Select onValueChange={field.onChange}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue />
@@ -804,10 +928,15 @@ const CreateProduct = () => {
             )}
 
             <div className="col-span-3 flex items-center justify-center">
-              <Button disabled={createLoading} className="w-full" type="submit">
-                {createLoading && (
-                  <Loader className="mr-2 h-4 w-4 animate-spin" />
-                )}
+              <Button
+                disabled={createLoading || updateLoading}
+                className="w-full"
+                type="submit"
+              >
+                {createLoading ||
+                  (updateLoading && (
+                    <Loader className="mr-2 h-4 w-4 animate-spin" />
+                  ))}
                 {product ? "Update" : "Create"}
               </Button>
             </div>

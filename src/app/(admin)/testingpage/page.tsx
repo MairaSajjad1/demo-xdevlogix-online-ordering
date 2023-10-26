@@ -29,6 +29,8 @@ const FormSchema = z.object({
       required_error: "Please select an email to display.",
     })
     .email(),
+
+  test: z.union([z.string(), z.number()]),
 });
 
 const page = () => {

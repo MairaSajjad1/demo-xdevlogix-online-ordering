@@ -4,6 +4,7 @@ import { create } from "zustand";
 interface IProduct {
   product: Product | null;
   setProduct: (arg: Product) => void;
+  clearProduct: () => void;
 }
 
 const useProduct = create<IProduct>((set) => ({

@@ -232,7 +232,7 @@ const ProductsList: FC = () => {
     []
   );
 
-  const { setProduct } = useProduct();
+  const { setProduct, clearProduct } = useProduct();
   const router = useRouter();
 
   const [deleteProduct, response] = useDeleteProductMutation();
@@ -297,7 +297,12 @@ const ProductsList: FC = () => {
               Import Product
             </Button>
             <Button asChild size={"sm"}>
-              <Link href={"/products/products-list/create"}>
+              <Link
+                onClick={() => {
+                  clearProduct();
+                }}
+                href={"/products/products-list/create"}
+              >
                 <PlusCircle className="mr-2 w-4 h-4" />
                 Add Product
               </Link>

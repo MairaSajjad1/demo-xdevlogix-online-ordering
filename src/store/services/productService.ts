@@ -36,15 +36,14 @@ const productService = createApi({
     }),
     getSpecificProducts: builder.query({
       query: ({ id }) => ({
-       
         url: `/products/without-token/${id}`,
         method: "GET",
       }),
       providesTags: ["product"],
     }),
     updateProduct: builder.mutation({
-      query: ({ data }) => ({
-        url: `/products/edit/${data?.id}`,
+      query: ({ data, id }) => ({
+        url: `/products/edit/${id}`,
         method: "POST",
         body: data,
       }),
@@ -58,12 +57,12 @@ const productService = createApi({
       invalidatesTags: ["product"],
     }),
     importData: builder.mutation({
-      query: ({data}) => ({
-        url: '/import',
-        method: 'POST',
+      query: ({ data }) => ({
+        url: "/import",
+        method: "POST",
         body: data,
       }),
-      invalidatesTags: ['product'],
+      invalidatesTags: ["product"],
     }),
   }),
 });
@@ -74,6 +73,6 @@ export const {
   useGetSpecificProductsQuery,
   useUpdateProductMutation,
   useDeleteProductMutation,
-  useImportDataMutation
+  useImportDataMutation,
 } = productService;
 export default productService;
