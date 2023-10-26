@@ -402,7 +402,7 @@ const CreateProduct = () => {
       formdata.append(`product_price[business_id]`, String(values.business_id));
       formdata.append(`product_locations[]`, values.location_id);
       if (
-        !values.product_images?.every(
+        !(values.product_images as [])?.every(
           (image: string) => typeof image === "string"
         )
       ) {
