@@ -91,7 +91,10 @@ const FileInput: FC<FileInputProps> = ({ images, fileAllowed, onChange }) => {
   }, []);
 
   const removeFile = (name: string) => {
-    if (files?.every((file) => typeof file === "string")) {
+    if (
+      Array.isArray(files) &&
+      files?.every((file) => typeof file === "string")
+    ) {
       setFiles((files) =>
         (files as string[]).filter((fileName) => name !== fileName)
       );
