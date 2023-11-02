@@ -51,8 +51,6 @@ const PermissionForm: FC<PermissionFormProps> = ({ setOpen, data, roleId }) => {
 
   const [update, updateResponse] = useUpdatePermissionMutation();
 
-
-  console.log(form.watch())
   function onSubmit(values: z.infer<typeof formSchema>) {
     update({
       data: {
@@ -80,27 +78,30 @@ const PermissionForm: FC<PermissionFormProps> = ({ setOpen, data, roleId }) => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-2 gap-2">
-      <FormField
-        control={form.control}
-        name="can_create"
-        render={({ field }) => (
-          <FormItem className="flex items-center space-x-1 rounded-md border p-1">
-            <FormControl>
-              <Input
-                type="checkbox"
-                id="can_create"
-                checked={field.value === '1'}
-                onChange={(e) => field.onChange(e.target.checked ? '1' : '0')}
-                className="w-4 h-4"
-              />
-            </FormControl>
-            <FormLabel className="text-sm">Create</FormLabel>
-          </FormItem>
-        )}
-      />
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="grid grid-cols-2 gap-2"
+      >
+        <FormField
+          control={form.control}
+          name="can_create"
+          render={({ field }) => (
+            <FormItem className="flex items-center space-x-1 rounded-md border p-1">
+              <FormControl>
+                <Input
+                  type="checkbox"
+                  id="can_create"
+                  checked={field.value === "1"}
+                  onChange={(e) => field.onChange(e.target.checked ? "1" : "0")}
+                  className="w-4 h-4"
+                />
+              </FormControl>
+              <FormLabel className="text-sm">Create</FormLabel>
+            </FormItem>
+          )}
+        />
 
-      <FormField
+        <FormField
           control={form.control}
           name="can_view"
           render={({ field }) => (
@@ -109,8 +110,8 @@ const PermissionForm: FC<PermissionFormProps> = ({ setOpen, data, roleId }) => {
                 <Input
                   type="checkbox"
                   id="can_view"
-                  checked={field.value === '1'}
-                  onChange={(e) => field.onChange(e.target.checked ? '1' : '0')}
+                  checked={field.value === "1"}
+                  onChange={(e) => field.onChange(e.target.checked ? "1" : "0")}
                   className="w-4 h-4"
                 />
               </FormControl>
@@ -119,48 +120,44 @@ const PermissionForm: FC<PermissionFormProps> = ({ setOpen, data, roleId }) => {
           )}
         />
 
-    <FormField
-        control={form.control}
-        name="can_update"
-        render={({ field }) => (
-          <FormItem className="flex items-center space-x-1 rounded-md border p-1">
-            <FormControl>
-              <Input
-                type="checkbox"
-                id="can_update"
-                checked={field.value === '1'}
-                onChange={(e) => field.onChange(e.target.checked ? '1' : '0')}
-                className="w-4 h-4"
-              />
-            </FormControl>
-            <FormLabel className="text-sm">Update</FormLabel>
-          </FormItem>
-        )}
-      />
+        <FormField
+          control={form.control}
+          name="can_update"
+          render={({ field }) => (
+            <FormItem className="flex items-center space-x-1 rounded-md border p-1">
+              <FormControl>
+                <Input
+                  type="checkbox"
+                  id="can_update"
+                  checked={field.value === "1"}
+                  onChange={(e) => field.onChange(e.target.checked ? "1" : "0")}
+                  className="w-4 h-4"
+                />
+              </FormControl>
+              <FormLabel className="text-sm">Update</FormLabel>
+            </FormItem>
+          )}
+        />
 
-      <FormField
-        control={form.control}
-        name="can_delete"
-        render={({ field }) => (
-          <FormItem className="flex items-center space-x-1 rounded-md border p-1">
-            <FormControl>
-              <Input
-                type="checkbox"
-                id="can_delete"
-                checked={field.value === '1'}
-                onChange={(e) => field.onChange(e.target.checked ? '1' : '0')}
-                className="w-4 h-4"
-              />
-            </FormControl>
-            <FormLabel className="text-sm">Delete</FormLabel>
-          </FormItem>
-        )}
-      />
-        <Button
-          disabled={updateLoading}
-          className="col-span-2"
-          type="submit"
-        >
+        <FormField
+          control={form.control}
+          name="can_delete"
+          render={({ field }) => (
+            <FormItem className="flex items-center space-x-1 rounded-md border p-1">
+              <FormControl>
+                <Input
+                  type="checkbox"
+                  id="can_delete"
+                  checked={field.value === "1"}
+                  onChange={(e) => field.onChange(e.target.checked ? "1" : "0")}
+                  className="w-4 h-4"
+                />
+              </FormControl>
+              <FormLabel className="text-sm">Delete</FormLabel>
+            </FormItem>
+          )}
+        />
+        <Button disabled={updateLoading} className="col-span-2" type="submit">
           {updateLoading ? (
             <Loader className="mr-2 h-4 w-4 animate-spin" />
           ) : (

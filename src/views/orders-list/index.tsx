@@ -12,7 +12,6 @@ import { useSession } from "next-auth/react";
 import { useGetOrdersQuery } from "@/store/services/orderListService";
 // import { useGetOrderReportQuery } from "@/store/services/orderReportService";
 
-
 export interface Order {
   id: any;
   order_no: string;
@@ -36,10 +35,6 @@ const Orders: FC = () => {
   });
 
   const [open, setOpen] = useState<boolean>(false);
-
-
-  console.log(session);
-
 
   const columns: ColumnDef<Order | null>[] = useMemo(
     () => [
@@ -77,7 +72,7 @@ const Orders: FC = () => {
         enableSorting: true,
         enableHiding: true,
       },
-     
+
       {
         accessorKey: "payment_status",
         header: ({ column }) => (
@@ -142,7 +137,6 @@ const Orders: FC = () => {
       //     />
       //   ),
       // },
-      
     ],
     []
   );
@@ -153,38 +147,29 @@ const Orders: FC = () => {
     setOpen((open) => !open);
   }, [open]);
 
-
-
-return (
-  <>
-    <div className="bg-[#FFFFFF] p-2 rounded-md overflow-hidden space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-semibold text-xl text-[#4741E1]">Orders</h1>
-          <p className="font-medium text-sm">The List of all Orders</p>
-        </div>
-        {/* <Button onClick={toggleModal} size={"sm"}>
+  return (
+    <>
+      <div className="bg-[#FFFFFF] p-2 rounded-md overflow-hidden space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="font-semibold text-xl text-[#4741E1]">Orders</h1>
+            <p className="font-medium text-sm">The List of all Orders</p>
+          </div>
+          {/* <Button onClick={toggleModal} size={"sm"}>
             <PlusCircle className="mr-2 w-4 h-4" />
             Add Order
           </Button> */}
-      
+        </div>
+        <Separator />
+        <Table
+          // @ts-ignore
+          columns={columns}
+          data={ordersLoading || ordersFetching ? loadingData : orders || []}
+          filterKey="name"
+        />
       </div>
-      <Separator />
-      <Table
-      // @ts-ignore
-        columns={columns}
-        data={
-          ordersLoading || ordersFetching ? loadingData : orders || []
-        }
-        filterKey="name"
-      />
-    </div>
-
-    
-
-   
-  </>
-);
+    </>
+  );
 };
 
 export default Orders;

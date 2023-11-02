@@ -17,8 +17,7 @@ import toast from "react-hot-toast";
 import { Rider } from "./index";
 import { useSession } from "next-auth/react";
 import { useCreateRiderMutation } from "@/store/services/riderService";
-import {useUpdateRiderMutation} from "@/store/services/riderService";
-
+import { useUpdateRiderMutation } from "@/store/services/riderService";
 
 const formSchema = z.object({
   name: z.string().min(1, { message: "Name is required." }),
@@ -47,8 +46,8 @@ const RiderForm: FC<RiderFormProps> = ({ setOpen, data }) => {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     data
-    ? update({ data: { ...values, id: data.id } })
-    : create({ data: values });
+      ? update({ data: { ...values, id: data.id } })
+      : create({ data: values });
   }
 
   const [create, createResponse] = useCreateRiderMutation();
@@ -84,43 +83,41 @@ const RiderForm: FC<RiderFormProps> = ({ setOpen, data }) => {
     }
   }, [updateError, updateSuccess]);
 
-    console.log( form.watch())
-
   return (
     <Form {...form}>
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
-      <FormField
-        control={form.control}
-        name="name"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Name</FormLabel>
-            <FormControl>
-              <Input placeholder="Ali" {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
-        name="mobile_no"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Mobile</FormLabel>
-            <FormControl>
-              <Input placeholder="923411415567" {...field} type="number" />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <Button disabled={createLoading} className="w-full" type="submit">
-        {createLoading && <Loader className="mr-2 h-4 w-4 animate-spin" />}
-        {data ? "Update" : "Add"}
-      </Button>
-    </form>
-  </Form>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Name</FormLabel>
+              <FormControl>
+                <Input placeholder="Ali" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="mobile_no"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Mobile</FormLabel>
+              <FormControl>
+                <Input placeholder="923411415567" {...field} type="number" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button disabled={createLoading} className="w-full" type="submit">
+          {createLoading && <Loader className="mr-2 h-4 w-4 animate-spin" />}
+          {data ? "Update" : "Add"}
+        </Button>
+      </form>
+    </Form>
   );
 };
 

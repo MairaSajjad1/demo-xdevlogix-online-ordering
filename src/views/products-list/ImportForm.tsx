@@ -17,13 +17,15 @@ interface ImportProductFormProps {
 }
 
 const ImportProductForm: FC<ImportProductFormProps> = ({ setOpen }) => {
-  const { handleSubmit, register, formState } = useForm<z.infer<typeof formSchema>>({
+  const { handleSubmit, register, formState } = useForm<
+    z.infer<typeof formSchema>
+  >({
     resolver: zodResolver(formSchema),
   });
 
   const [create, importResponse] = useImportDataMutation();
   const { isLoading, isError, isSuccess } = importResponse;
-console.log({formState})
+
   // Handle form submission
   const handleFormSubmit = async (formData: z.infer<typeof formSchema>) => {
     try {
@@ -59,7 +61,11 @@ console.log({formState})
           {...register("file", { required: "File is required" })}
         />
         <Button disabled={isLoading} className="w-24" type="submit">
-          {isLoading ? <Loader className="mr-2 h-4 w-4 animate-spin" /> : "Import"}
+          {isLoading ? (
+            <Loader className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            "Import"
+          )}
         </Button>
       </div>
     </form>

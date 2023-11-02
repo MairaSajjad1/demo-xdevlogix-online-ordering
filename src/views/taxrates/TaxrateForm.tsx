@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { BiLoaderAlt as Loader } from "react-icons/bi";
 import toast from "react-hot-toast";
 import { Taxrate } from "./index";
-import { useCreateTaxrateMutation } from "@/store/services/taxrateService"; 
+import { useCreateTaxrateMutation } from "@/store/services/taxrateService";
 import { useUpdateTaxratesMutation } from "@/store/services/taxrateService";
 import { useSession } from "next-auth/react";
 
@@ -46,8 +46,8 @@ const TaxrateForm: FC<TaxrateFormProps> = ({ setOpen, data }) => {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     data
-    ? update({ data: { ...values, id: data.id } })
-    : create({ data: values });
+      ? update({ data: { ...values, id: data.id } })
+      : create({ data: values });
   }
 
   const [create, createResponse] = useCreateTaxrateMutation();
@@ -85,8 +85,6 @@ const TaxrateForm: FC<TaxrateFormProps> = ({ setOpen, data }) => {
     }
   }, [updateError, updateSuccess]);
 
-    console.log( form.watch())
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
@@ -116,7 +114,7 @@ const TaxrateForm: FC<TaxrateFormProps> = ({ setOpen, data }) => {
             </FormItem>
           )}
         />
-       <Button
+        <Button
           disabled={createLoading || updateLoading}
           className="w-full"
           type="submit"

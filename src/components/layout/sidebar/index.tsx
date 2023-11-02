@@ -22,6 +22,7 @@ import {
   BiCategory as Category,
   BiDollarCircle as Buisness,
   BiBarcodeReader as Barcode,
+  BiHelpCircle,
 } from "react-icons/bi";
 import { TbReceiptTax as Tax } from "react-icons/tb";
 import { PiCertificateBold as Brand } from "react-icons/pi";
@@ -165,11 +166,15 @@ const Sidebar: FC<SidebarProps> = ({
       icon: <Report size={20} />,
       slug: "/reports",
     },
+    {
+      label: "Help",
+      icon: <BiHelpCircle size={20} />,
+      slug: "/help",
+    },
   ];
 
   const toggleIsHovered = () => {
     if (!open) toggleOpen();
-
   };
 
   const sidebarContainerClasses = classNames(

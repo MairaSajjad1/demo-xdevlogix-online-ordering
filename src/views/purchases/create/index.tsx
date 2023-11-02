@@ -88,7 +88,7 @@ const formSchema = z.object({
 const Create = () => {
   const { data: session } = useSession();
 
-  const {purchase} = usePurchase();
+  const { purchase } = usePurchase();
   const router = useRouter();
 
   const {
@@ -142,14 +142,12 @@ const Create = () => {
           quantity: "",
         },
       ],
-      business_id: session?.user?.business_id, 
-      created_by: session?.user?.customer_id,  
+      business_id: session?.user?.business_id,
+      created_by: session?.user?.customer_id,
     },
   });
 
   const [create, createResponse] = useCreatePurchaseMutation();
-  
-  
 
   const {
     isLoading: createLoading,
@@ -182,15 +180,13 @@ const Create = () => {
   };
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-     console.log("Form Data:", values); 
-     if (purchase === null){
+    if (purchase === null) {
       create({
-          data: values,
-        });
-       }
-     else{
+        data: values,
+      });
+    } else {
       toast.success("Update");
-     }
+    }
     // create({
     //   data: values,
     // });
@@ -199,8 +195,7 @@ const Create = () => {
   return (
     <div className="bg-[#FFFFFF] p-2 rounded-md overflow-hidden space-y-4">
       <h1 className="text-[#4741E1] font-semibold">
-        
-      {purchase ? "Edit Purchase" : "Add New Purchase"}
+        {purchase ? "Edit Purchase" : "Add New Purchase"}
       </h1>
       <Form {...form}>
         <form
