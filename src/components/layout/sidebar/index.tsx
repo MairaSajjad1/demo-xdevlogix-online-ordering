@@ -153,11 +153,11 @@ const Sidebar: FC<SidebarProps> = ({
           icon: <Tax size={20} />,
           slug: "/settings/taxrates",
         },
-        {
-          label: "Business",
-          icon: <Buisness size={20} />,
-          slug: "/settings/buisnesses",
-        },
+        // {
+        //   label: "Business",
+        //   icon: <Buisness size={20} />,
+        //   slug: "/settings/buisnesses",
+        // },
       ],
     },
     {
@@ -169,7 +169,6 @@ const Sidebar: FC<SidebarProps> = ({
 
   const toggleIsHovered = () => {
     if (!open) toggleOpen();
-
   };
 
   const sidebarContainerClasses = classNames(
