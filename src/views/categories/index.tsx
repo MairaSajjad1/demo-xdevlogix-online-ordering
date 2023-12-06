@@ -21,6 +21,18 @@ export interface Category {
   name: string;
   business_id: number;
   customer_id: any;
+  sub_category: SubCategory[];
+  created_by: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SubCategory {
+  id: number;
+  name: string;
+  business_id: number;
+  customer_id: any;
+  sub_category: SubCategory[];
   created_by: number;
   created_at: string;
   updated_at: string;
