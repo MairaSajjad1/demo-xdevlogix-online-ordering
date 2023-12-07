@@ -20,6 +20,7 @@ export interface Category {
   id: number;
   name: string;
   business_id: number;
+  parent_id: number;
   customer_id: any;
   sub_category: SubCategory[];
   created_by: number;
