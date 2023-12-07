@@ -28,7 +28,7 @@ export interface Category {
   updated_at: string;
 }
 
-export interface SubCategory {
+export interface SubCategory extends Category {
   id: number;
   name: string;
   business_id: number;
@@ -66,6 +66,21 @@ const Categories: FC = () => {
     null
   );
 
+  const renderSubCategories = (categories: Category[]) => {
+    return (
+      <div className="flex items-center gap-4">
+        {categories.map((subCategory) => (
+          <div key={subCategory.id} className="bg-[#F5F5F5] px-2 py-1 rounded-lg">
+            {subCategory.name}
+            {subCategory.sub_category && subCategory.sub_category.length > 0 && (
+              renderSubCategories(subCategory.sub_category)
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   const columns: ColumnDef<Category | null>[] = useMemo(
     () => [
       {
@@ -85,6 +100,29 @@ const Categories: FC = () => {
         enableSorting: true,
         enableHiding: false,
       },
+
+      {
+        accessorKey: "sub_category",
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Subcategories" />
+        ),
+        cell: ({ row }) => {
+          if (!row || !row.original) {
+            return null;
+          }
+
+          const subCategories: Category[] | undefined = row?.getValue("sub_category");
+
+          return (
+            <>
+              {subCategories ? renderSubCategories(subCategories) : null}
+            </>
+          );
+        },
+        enableSorting: true,
+        enableHiding: false,
+      },
+      
       {
         id: "actions",
         cell: ({ row }) => (
