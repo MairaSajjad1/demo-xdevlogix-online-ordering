@@ -66,20 +66,20 @@ const Categories: FC = () => {
     null
   );
 
-  const renderSubCategories = (categories: Category[]) => {
-    return (
-      <div className="flex items-center gap-4">
-        {categories.map((subCategory) => (
-          <div key={subCategory.id} className="bg-[#F5F5F5] px-2 py-1 rounded-lg">
-            {subCategory.name}
-            {subCategory.sub_category && subCategory.sub_category.length > 0 && (
-              renderSubCategories(subCategory.sub_category)
-            )}
-          </div>
-        ))}
-      </div>
-    );
-  };
+  // const renderSubCategories = (categories: Category[]) => {
+  //   return (
+  //     <div className="flex items-center gap-4">
+  //       {categories.map((subCategory) => (
+  //         <div key={subCategory.id} className="bg-[#F5F5F5] px-2 py-1 rounded-lg">
+  //           {subCategory.name}
+  //           {subCategory.sub_category && subCategory.sub_category.length > 0 && (
+  //             renderSubCategories(subCategory.sub_category)
+  //           )}
+  //         </div>
+  //       ))}
+  //     </div>
+  //   );
+  // };
 
   const columns: ColumnDef<Category | null>[] = useMemo(
     () => [
@@ -100,28 +100,51 @@ const Categories: FC = () => {
         enableSorting: true,
         enableHiding: false,
       },
-
       {
-        accessorKey: "sub_category",
-        header: ({ column }) => (
-          <DataTableColumnHeader column={column} title="Subcategories" />
+        accessorKey: "id",
+        header: "Subcategory",
+        cell: ({ row }) => (
+          <div>
+            {row?.original ?
+            (
+              <a
+              // row.original.id
+                href={`/dashboard/category/${row.getValue("id")}`}
+                className="text-black-500 hover:underline"
+              >
+                View Subcategory
+              </a>
+            )
+            : (
+              <Skeleton className="w-20 h-4 bg-[#F5f5f5]" />
+            )}
+          </div>
         ),
-        cell: ({ row }) => {
-          if (!row || !row.original) {
-            return null;
-          }
-
-          const subCategories: Category[] | undefined = row?.getValue("sub_category");
-
-          return (
-            <>
-              {subCategories ? renderSubCategories(subCategories) : null}
-            </>
-          );
-        },
-        enableSorting: true,
+        enableSorting: false,
         enableHiding: false,
       },
+
+      // {
+      //   accessorKey: "sub_category",
+      //   header: ({ column }) => (
+      //     <DataTableColumnHeader column={column} title="Subcategories" />
+      //   ),
+      //   cell: ({ row }) => {
+      //     if (!row || !row.original) {
+      //       return null;
+      //     }
+
+      //     const subCategories: Category[] | undefined = row?.getValue("sub_category");
+
+      //     return (
+      //       <>
+      //         {subCategories ? renderSubCategories(subCategories) : null}
+      //       </>
+      //     );
+      //   },
+      //   enableSorting: true,
+      //   enableHiding: false,
+      // },
       
       {
         id: "actions",
