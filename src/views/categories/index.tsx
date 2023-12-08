@@ -1,6 +1,7 @@
 "use client";
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
+import Link from "next/link";
 import { ColumnDef } from "@tanstack/react-table";
 import { GoPlusCircle as PlusCircle } from "react-icons/go";
 import Table from "@/components/table";
@@ -105,17 +106,11 @@ const Categories: FC = () => {
         header: "Subcategory",
         cell: ({ row }) => (
           <div>
-            {row?.original ?
-            (
-              <a
-              // row.original.id
-                href={`/dashboard/category/${row.getValue("id")}`}
-                className="text-black-500 hover:underline"
-              >
+            {row?.original ? (
+                <a href={`/settings/categories/${row.getValue("id")}`} className="text-black-500 hover:underline">
                 View Subcategory
               </a>
-            )
-            : (
+            ) : (
               <Skeleton className="w-20 h-4 bg-[#F5f5f5]" />
             )}
           </div>
@@ -123,6 +118,29 @@ const Categories: FC = () => {
         enableSorting: false,
         enableHiding: false,
       },
+      // {
+      //   accessorKey: "id",
+      //   header: "Subcategory",
+      //   cell: ({ row }) => (
+      //     <div>
+      //       {row?.original ?
+      //       (
+      //         <a
+      //         // row.original.id
+      //           href={`/dashboard/category/${row.getValue("id")}`}
+      //           className="text-black-500 hover:underline"
+      //         >
+      //           View Subcategory
+      //         </a>
+      //       )
+      //       : (
+      //         <Skeleton className="w-20 h-4 bg-[#F5f5f5]" />
+      //       )}
+      //     </div>
+      //   ),
+      //   enableSorting: false,
+      //   enableHiding: false,
+      // },
 
       // {
       //   accessorKey: "sub_category",

@@ -68,7 +68,6 @@ export interface Role {
             {row?.original ?
             (
               <a
-              // row.original.id
                 href={`/dashboard/permission/${row.getValue("id")}`}
                 className="text-black-500 hover:underline"
               >

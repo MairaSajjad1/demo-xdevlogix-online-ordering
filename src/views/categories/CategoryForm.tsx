@@ -16,6 +16,7 @@ import { BiLoaderAlt as Loader } from "react-icons/bi";
 import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
 import { Category } from "./index";
+import { useGetSpecificCategoriesQuery } from "@/store/services/categoryService";
 import { useUpdateCategoriesMutation } from "@/store/services/categoryService";
 import { useCreateCategoryMutation } from "@/store/services/categoryService";
 

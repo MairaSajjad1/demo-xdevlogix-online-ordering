@@ -34,6 +34,15 @@ const categoryService = createApi({
         data?.sort((a, b) => b.id - a.id),
       providesTags: ["category"],
     }),
+    getSpecificCategories: builder.query({
+      query: ({ buisnessId, perPage }) => ({
+        url: `/categories?business_id=${buisnessId}&per_page=${perPage}`,
+        method: "GET",
+      }),
+      transformResponse: ({ data }: { data: Category[] }) =>
+        data?.sort((a, b) => b.id - a.id),
+      providesTags: ["category"],
+    }),
     updateCategories: builder.mutation({
       query: ({ data }) => ({
         url: `/categories/update/${data?.id}`,
@@ -52,6 +61,6 @@ const categoryService = createApi({
   }),
 });
 
-export const { useCreateCategoryMutation, useGetCategoriesQuery ,useUpdateCategoriesMutation ,useDeleteCategoryMutation } =
+export const { useCreateCategoryMutation, useGetCategoriesQuery, useGetSpecificCategoriesQuery ,useUpdateCategoriesMutation ,useDeleteCategoryMutation } =
   categoryService;
 export default categoryService;

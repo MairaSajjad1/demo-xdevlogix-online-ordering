@@ -8,6 +8,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useState } from "react";
 import { BiLoaderAlt as Loader } from "react-icons/bi";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -36,6 +37,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import toast from "react-hot-toast";
 import { useEffect, useMemo } from "react";
 import { useGetCategoriesQuery } from "@/store/services/categoryService";
+import { useGetSpecificCategoriesQuery } from "@/store/services/categoryService";
 import { Category } from "@/views/categories";
 import { useGetVariationsQuery } from "@/store/services/variationService";
 import { Variation } from "@/views/variations";
@@ -62,6 +64,7 @@ const formSchema = z.object({
   selling_price_inc_tax: z.string().optional(),
   quantity: z.string().optional(),
   category_id: z.string().min(1, { message: "Category is required." }),
+  sub_category_id: z.string().min(1, { message: "Category is required." }),
   brand_id: z.string().min(1, { message: "Brand is required." }),
   barcode_id: z.string().min(1, { message: "Barcode is required." }),
   tax_id: z.string().min(1, { message: "Tax is required." }),
@@ -94,8 +97,18 @@ const formSchema = z.object({
   business_id: z.coerce.number(),
 });
 
+type SubCategory = {
+  id: string;
+  name: string;
+  
+};
+
+
 const CreateProduct = () => {
   const { data: session } = useSession();
+
+  const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
 
   const { product } = useProduct();
   const router = useRouter();
@@ -116,6 +129,7 @@ const CreateProduct = () => {
       quantity: "",
       product_images: [],
       category_id: "",
+      sub_category_id: "",
       price_exclusive_tax: "",
       price_inclusive_tax: "",
       profit_margin: "",
@@ -177,6 +191,12 @@ const CreateProduct = () => {
       perPage: -1,
     });
 
+    const { data: subcategoriesList, isLoading: subcategoriesLoading } =
+    useGetSpecificCategoriesQuery({
+      buisnessId: session?.user?.business_id,
+      perPage: -1,
+    });
+
   const { data: variationsList, isLoading: variationsLoading } =
     useGetVariationsQuery({
       buisnessId: session?.user?.business_id,
@@ -196,6 +216,23 @@ const CreateProduct = () => {
       });
     }
   }, [variations]);
+
+  // useEffect(() => {
+  //   if (selectedCategory !== null) {
+  //     const { data: subcategoriesList, isLoading: subcategoriesLoading } =
+  //       useGetCategoriesQuery(session?.user?.business_id, selectedCategory);
+
+  //     setSubCategories(subcategoriesList || []); // Update subcategories state
+  //   }
+  // }, [selectedCategory]);
+
+  // useEffect(() => {
+  //   if (selectedCategory !== null) {
+  //     fetchSubCategories(selectedCategory).then((subCategoriesData: SubCategory[]) => {
+  //       setSubCategories(subCategoriesData);
+  //     });
+  //   }
+  // }, [selectedCategory]);
 
   const [create, createResponse] = useCreateProductMutation();
 
@@ -297,6 +334,7 @@ const CreateProduct = () => {
         );
       }
       formdata.append("category_id", values.category_id);
+      formdata.append("sub_category_id", values.sub_category_id);
       create({ data: formdata });
     } else {
       toast.success("Update");
@@ -307,6 +345,13 @@ const CreateProduct = () => {
     form.setValue("product_images", files);
   };
   const loadingData = Array.from({ length: 10 }, (_, index) => index + 1);
+
+  // const handleCategorySelect = (categoryId: number) => {
+  //   setSelectedCategory(categoryId);
+  //   fetchSubCategories(categoryId).then((subCategoriesData: SubCategory[]) => {
+  //     setSubCategories(subCategoriesData);
+  //   });
+  // };
   return (
     <>
       <div className="bg-[#FFFFFF] p-2 rounded-md overflow-hidden space-y-4">
@@ -456,6 +501,43 @@ const CreateProduct = () => {
                 </FormItem>
               )}
             />
+            <FormField
+  control={form.control}
+  name="sub_category_id"
+  render={({ field }) => (
+    <FormItem>
+      <FormLabel>Sub Category</FormLabel>
+      <Select onValueChange={field.onChange}>
+        <FormControl>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+        </FormControl>
+        <SelectContent className="max-h-60">
+          {subcategoriesLoading && (
+            <>
+              {loadingData?.map((i) => (
+                <SelectItem key={i} value={String(i)}>
+                  <Skeleton className="w-20 h-4 bg-[#F5F5F5]" />
+                </SelectItem>
+              ))}
+            </>
+          )}
+          {subCategories.map((subCategory) => (
+            <SelectItem
+              key={subCategory.id}
+              value={String(subCategory.id)}
+            >
+              {subCategory.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <FormMessage />
+    </FormItem>
+  )}
+/>
+
             <FormField
               control={form.control}
               name="brand_id"
