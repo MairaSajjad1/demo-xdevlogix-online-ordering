@@ -97,11 +97,16 @@ const formSchema = z.object({
   business_id: z.coerce.number(),
 });
 
-type SubCategory = {
-  id: string;
+interface SubCategory {
+  id: number;
   name: string;
-  
-};
+  parent_id: number;
+  created_by: number;
+  created_at: string;
+  updated_at: string;
+  business_id: number;
+  sub_category: SubCategory[]; // Recursive definition for subcategories
+}
 
 
 const CreateProduct = () => {
@@ -217,22 +222,7 @@ const CreateProduct = () => {
     }
   }, [variations]);
 
-  // useEffect(() => {
-  //   if (selectedCategory !== null) {
-  //     const { data: subcategoriesList, isLoading: subcategoriesLoading } =
-  //       useGetCategoriesQuery(session?.user?.business_id, selectedCategory);
-
-  //     setSubCategories(subcategoriesList || []); // Update subcategories state
-  //   }
-  // }, [selectedCategory]);
-
-  // useEffect(() => {
-  //   if (selectedCategory !== null) {
-  //     fetchSubCategories(selectedCategory).then((subCategoriesData: SubCategory[]) => {
-  //       setSubCategories(subCategoriesData);
-  //     });
-  //   }
-  // }, [selectedCategory]);
+ 
 
   const [create, createResponse] = useCreateProductMutation();
 
@@ -346,12 +336,32 @@ const CreateProduct = () => {
   };
   const loadingData = Array.from({ length: 10 }, (_, index) => index + 1);
 
-  // const handleCategorySelect = (categoryId: number) => {
-  //   setSelectedCategory(categoryId);
-  //   fetchSubCategories(categoryId).then((subCategoriesData: SubCategory[]) => {
-  //     setSubCategories(subCategoriesData);
-  //   });
-  // };
+  const handleCategorySelect = (categoryId: string) => {
+    const categoryIdNumber = Number(categoryId);
+  
+    setSelectedCategory(categoryIdNumber);
+  
+    const handleCategorySelect = (categoryId: string) => {
+      const categoryIdNumber = Number(categoryId);
+  
+      setSelectedCategory(categoryIdNumber);
+      // const selectedCategoryObject = categoriesList.find((category: Category) => category.id === categoryIdNumber);
+  
+      // if (selectedCategoryObject) {
+      //     const subcategories: SubCategory[] = selectedCategoryObject.sub_category || [];
+      //     const formattedSubcategories = subcategories.map((subCategory) => ({
+      //         id: String(subCategory.id),
+      //         name: subCategory.name,
+      //         parent_id: subCategory.parent_id,
+      //         created_by: subCategory.created_by,
+      //         created_at: subCategory.created_at,
+      //         updated_at: subCategory.updated_at,
+      //     }));
+  
+      //     setSubCategories(formattedSubcategories);
+      // }
+  };
+
   return (
     <>
       <div className="bg-[#FFFFFF] p-2 rounded-md overflow-hidden space-y-4">
@@ -465,78 +475,84 @@ const CreateProduct = () => {
               )}
             />
             <FormField
-              control={form.control}
-              name="category_id"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Category</FormLabel>
-                  <Select onValueChange={field.onChange}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="max-h-60">
-                      {categoriesLoading && (
-                        <>
-                          {loadingData?.map((i) => (
-                            <SelectItem key={i} value={String(i)}>
-                              <Skeleton className="w-20 h-4 bg-[#F5F5F5]" />
-                            </SelectItem>
-                          ))}
-                        </>
-                      )}
-                      {categoriesList &&
-                        categoriesList?.map((category: Category) => (
-                          <SelectItem
-                            key={category.id}
-                            value={String(category.id)}
-                          >
-                            {category.name}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-  control={form.control}
-  name="sub_category_id"
-  render={({ field }) => (
-    <FormItem>
-      <FormLabel>Sub Category</FormLabel>
-      <Select onValueChange={field.onChange}>
-        <FormControl>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-        </FormControl>
-        <SelectContent className="max-h-60">
-          {subcategoriesLoading && (
-            <>
-              {loadingData?.map((i) => (
-                <SelectItem key={i} value={String(i)}>
-                  <Skeleton className="w-20 h-4 bg-[#F5F5F5]" />
-                </SelectItem>
-              ))}
-            </>
-          )}
-          {subCategories.map((subCategory) => (
-            <SelectItem
-              key={subCategory.id}
-              value={String(subCategory.id)}
-            >
-              {subCategory.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      <FormMessage />
-    </FormItem>
-  )}
-/>
+        control={form.control}
+        name="category_id"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Category</FormLabel>
+            {/* <Select onValueChange={(value) => { field.onChange(value); handleCategorySelect(value); }}>
+             */}
+             <Select onValueChange={(value) => {
+               console.log("Selected value:", value);
+              form.setValue("sub_category_id", value); handleCategorySelect(value); }}>
+              <FormControl>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent className="max-h-60">
+                {categoriesLoading && (
+                  <>
+                    {loadingData?.map((i) => (
+                      <SelectItem key={i} value={String(i)}>
+                        <Skeleton className="w-20 h-4 bg-[#F5F5F5]" />
+                      </SelectItem>
+                    ))}
+                  </>
+                )}
+                {categoriesList &&
+                  categoriesList?.map((category: Category) => (
+                    <SelectItem
+                      key={category.id}
+                      value={String(category.id)}
+                    >
+                      {category.name}
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="sub_category_id"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Sub Category</FormLabel>
+            <Select onValueChange={field.onChange}>
+              <FormControl>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent className="max-h-60">
+                {subcategoriesLoading && (
+                  <>
+                    {loadingData?.map((i) => (
+                      <SelectItem key={i} value={String(i)}>
+                        <Skeleton className="w-20 h-4 bg-[#F5F5F5]" />
+                      </SelectItem>
+                    ))}
+                  </>
+                )}
+                {subCategories.map((subCategory) => (
+                  <SelectItem
+                    key={subCategory.id}
+                    value={String(subCategory.id)}
+                  >
+                    {subCategory.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
 
             <FormField
               control={form.control}
@@ -875,5 +891,6 @@ const CreateProduct = () => {
     </>
   );
 };
+}
 
 export default CreateProduct;
